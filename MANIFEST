@@ -1,0 +1,4 @@
+bin/tinydns-filter
+Build.PL
+lib/Config/TinyDNS.pm
+MANIFEST			This list of files
