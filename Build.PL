@@ -6,6 +6,7 @@ Module::Build->new(
     requires        => {
         "File::Slurp"       => 0,
         "Exporter::NoWork"  => 0,
+        "List::MoreUtils"   => 0,
     },
     build_requires  => {
         "Test::More"        => "0.65",

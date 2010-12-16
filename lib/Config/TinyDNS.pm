@@ -3,7 +3,8 @@ package Config::TinyDNS;
 use 5.010;
 use warnings;
 use strict;
-use Scalar::Util qw/reftype/;
+use Scalar::Util    qw/reftype/;
+use List::MoreUtils qw/natatime/;
 use Carp;
 
 use Exporter::NoWork;
@@ -21,22 +22,24 @@ sub join_tdns_data {
     join "", map "$_\n", map { $_->[0] . join ":", @$_[1..$#$_] } @_;
 }
 
-sub _decode_filt;
-sub _decode_filt {
-    my ($f) = @_;
+sub _lookup_filt {
+    my ($k, @args) = @_;
+    my $f = $Filters{$k} or croak "bad filter: $k";
     given (reftype $f) {
         when ("CODE")   { return $f }
-        when (undef)    { 
-            return _decode_filt(
-                $Filters{$f} or croak "no such filter: $f"
-            );
-        }
-        when ("REF")    { return ($$f)->() }
-        when ("ARRAY")  { 
-            my $g = _decode_filt shift @$f;
-            return $g->(@$f);
-        }
-        default         { die "bad filter: $f" }
+        when ("REF")    { return ($$f)->(@args) }
+        default         { die "bad \%Filters entry: $k => $f" }
+    }
+}
+    
+sub _decode_filt {
+    my ($f) = @_;
+    defined $f or return;
+    given (reftype $f) {
+        when ("CODE")   { return $f }
+        when (undef)    { return _lookup_filt $f }
+        when ("ARRAY")  { return _lookup_filt @$f }
+        default         { croak "bad filter: $f" }
     }
 }
 
@@ -57,11 +60,19 @@ sub process_config {
 }
 
 sub register_filters {
-    my %new = @_;
-    %Filters = (%new, %Filters);
+    my $i = natatime 2, @_;
+    while (my ($k, $c) = $i->()) {
+        $Filters{$k}    and croak "filter '$k' is already registered";
+        ref $c and (
+            reftype $c eq "CODE" or (
+                reftype $c eq "REF" and reftype $$c eq "CODE"
+            )
+        )               or  croak "filter must be a coderef(ref)";
+        $Filters{$k} = $c;
+    }
 }
 
-%Filters = (
+register_filters
     null => sub { [$_, @_] },
     vars => \sub {
         my %vars;
@@ -122,7 +133,7 @@ sub register_filters {
         };
         sub { /[.&+=\@]/ and $repl->($_[1]); [$_, @_]; };
     },
-    site => sub {
+    site => \sub {
         my %sites = map +($_, 1), @_;
         sub {
             /%/             or return [$_, @_];
@@ -132,6 +143,6 @@ sub register_filters {
             return [$_, @_];
         };
     },
-);
+    ;
 
 1;
