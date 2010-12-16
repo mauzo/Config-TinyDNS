@@ -4,6 +4,11 @@ use 5.010;
 use warnings;
 use strict;
 use Scalar::Util qw/reftype/;
+use Carp;
+
+use Exporter::NoWork;
+
+our $VERSION = 1;
 
 my %Filters;
 
@@ -13,7 +18,7 @@ sub split_tdns_data {
 
 sub join_tdns_data {
     no warnings "uninitialized";
-    join "\n", map { $_->[0] . join ":", @$_[1..$#$_] } @_;
+    join "", map "$_\n", map { $_->[0] . join ":", @$_[1..$#$_] } @_;
 }
 
 sub _decode_filt;
@@ -21,7 +26,11 @@ sub _decode_filt {
     my ($f) = @_;
     given (reftype $f) {
         when ("CODE")   { return $f }
-        when (undef)    { return _decode_filt $Filters{$f} }
+        when (undef)    { 
+            return _decode_filt(
+                $Filters{$f} or croak "no such filter: $f"
+            );
+        }
         when ("REF")    { return ($$f)->() }
         when ("ARRAY")  { 
             my $g = _decode_filt shift @$f;
