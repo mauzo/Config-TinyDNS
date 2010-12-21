@@ -7,4 +7,4 @@ use Config::TinyDNS qw/:ALL/;
 use File::Slurp     qw/slurp/;
 
 my @filters = map { /^(.*?)=(.*)/ ? [$1, split /,/, $2] : $_ } @ARGV;
-print process_config scalar slurp(\*STDIN), @filters;
+print filter_tdns_data scalar slurp(\*STDIN), @filters;

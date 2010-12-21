@@ -14,7 +14,11 @@ our $VERSION = 1;
 my %Filters;
 
 sub split_tdns_data {
-    map { s/(.)//; [$1, split /:/] } split /\n/, $_[0];
+    map { 
+        s/(.)// 
+            ? [$1, ($1 eq "#" ? $_ : split /:/)] 
+            : () 
+    } split /\n/, $_[0];
 }
 
 sub join_tdns_data {
@@ -43,7 +47,7 @@ sub _decode_filt {
     }
 }
 
-sub process_config {
+sub filter_tdns_data {
     my @lines = split_tdns_data shift;
     for my $f (@_) {
         my $c = _decode_filt $f;
@@ -53,13 +57,12 @@ sub process_config {
                 local $_ = $f;
                 $c->(@r);
             } 
-            grep defined $_->[0],
             @lines;
     }
     return join_tdns_data @lines;
 }
 
-sub register_filters {
+sub register_tdns_filters {
     my $i = natatime 2, @_;
     while (my ($k, $c) = $i->()) {
         $Filters{$k}    and croak "filter '$k' is already registered";
@@ -72,7 +75,10 @@ sub register_filters {
     }
 }
 
-register_filters
+# just for the tests
+sub _filter_hash { \%Filters }
+
+register_tdns_filters
     null => sub { [$_, @_] },
     vars => \sub {
         my %vars;
