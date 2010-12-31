@@ -2,3 +2,17 @@ bin/tinydns-filter
 Build.PL
 lib/Config/TinyDNS.pm
 MANIFEST			This list of files
+t/00use.t
+t/filter-call.t
+t/filter-lookup.t
+t/one
+t/splitjoin.t
+t/std-include.t
+t/std-lresolv.t
+t/std-null.t
+t/std-rresolv.t
+t/std-site.t
+t/std-vars.t
+t/two
+t/Utils.pm
+t/var
