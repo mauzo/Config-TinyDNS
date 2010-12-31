@@ -81,12 +81,17 @@ DATA
 
     is join_tdns_data(
             ["=", "dom", "1.2.3.4", "", "", "ex"],
-            ["+", "dim", "1.2.3.4", "", "12345", ""],
         ), <<DATA,
 =dom:1.2.3.4:::ex
-+dim:1.2.3.4::12345:
 DATA
-        "...blank fields are preserved";
+        "...non-trailing blank fields are preserved";
+
+    is join_tdns_data(
+            ["=", "dom", "1.2.3.4", "", "", ""],
+        ), <<DATA,
+=dom:1.2.3.4
+DATA
+        "...but trailing blanks are ignored";
 
     is join_tdns_data(["*"]), "*\n",
         "...just a special character";

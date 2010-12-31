@@ -21,9 +21,17 @@ sub split_tdns_data {
     } split /\n/, $_[0];
 }
 
+sub _strip_blank { 
+    @_ = @{[@_]}; 
+    pop while @_ and not length $_[-1]; 
+    @_;
+}
+
 sub join_tdns_data {
     no warnings "uninitialized";
-    join "", map "$_\n", map { $_->[0] . join ":", @$_[1..$#$_] } @_;
+    join "", map "$_\n", map { 
+        $_->[0] . join ":", _strip_blank @$_[1..$#$_] 
+    } @_;
 }
 
 sub _lookup_filt {
@@ -105,6 +113,7 @@ register_tdns_filters
         };
     },
     lresolv => \sub {
+        no warnings "uninitialized";
         my %hosts;
         my $repl = sub {
             for ((defined $_[1] ? "$_[0]:$_[1]" : ()), $_[0]) {
@@ -117,13 +126,14 @@ register_tdns_filters
                 }
             }
         };
-        my $qual = sub { $_[0] =~ /\./ ? "$_[0].$_[1].$_[2]" : $_[0] };
+        my $qual = sub { $_[0] =~ /\./ ? $_[0] : "$_[0].$_[1].$_[2]" };
         my $lo   = sub { $_[0] . (defined $_[1] ? ":$_[1]" : "") };
         sub { 
             given ($_) {
                 when ([".", "&"]) { 
                     $repl->(@_[1, 5]);
-                    $hosts{$lo->($qual->($_[2], "ns", $_[0]), $_[5])} = $_[1];
+                    my $key = $lo->($qual->($_[2], "ns", $_[0]), $_[5]);
+                    $hosts{$key} = $_[1];
                 }
                 when (["=", "+"]) {
                     $repl->(@_[1, 4]);
