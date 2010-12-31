@@ -1,0 +1,62 @@
+# locations
+%mp:192.168.1:mountplym
+%ex
+
+# variables
+$m:morrow.me.uk
+$p:prospectbooks.co.uk
+
+# real hosts with IPs
+=isis.$m:204.109.63.142
+=prospect.$m:204.109.63.171
+Idyn.mountplym
+
+# aliases ->isis
++$m:isis.$m
++imap.$m:isis.$m
++moreland.$m:isis.$m
++new.webmail.$m:isis.$m
++smtp.$m:isis.$m
++webmail.$m:isis.$m
++www.$m:isis.$m
+
+# aliases ->prospect
++$p:prospect.$m
++new.$p:$p
++old.$p:$p
++www.$p:$p
+
+# aliases ->mountplym
++osiris.$m:mountplym.$m:::ex
++anubis.$m:mountplym.$m:::ex
+
+# mountplym internal
+=thoth.$m:192.168.1.254:::mp
+=osiris.$m:192.168.1.64:::mp
+=seth.$m:192.168.1.65:::mp
+=anubis.$m:192.168.1.67:::mp
+
+# nameservers
+.$m:isis.$m:a:::ex
+.$m:ns9.zoneedit.com:b:::ex
+.$m:ns13.zoneedit.com:c:::ex
+
+&foo.$m:1.2.3.4:a
+
+.$m:anubis.$m:a:::mp
+.168.192.in-addr.arpa::anubis.$m:::mp
+
+.$p:prospect.$m:a
+.$p:ns2.zoneedit.com:b
+.$p:ns17.zoneedit.com:c
+
+# MX
+@$m:isis.$m:a
+@anubis.$m::anubis.$m::::mp
+@anubis.$m::isis.$m::::ex
+
+@$p:$p:a:0
+@$p:mx3.zoneedit.com:b:100
+
+# SRV
+S_imap._tcp.$m::imap.$m:443:0:0
