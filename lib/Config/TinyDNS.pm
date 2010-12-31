@@ -81,10 +81,12 @@ sub _filter_hash { \%Filters }
 register_tdns_filters
     null => sub { [$_, @_] },
     vars => \sub {
-        my %vars;
+        my %vars = ('$' => '$');
         sub {
-            s/\$(\w+)/$vars{$1}/ge for @_;
-            /\$/ or return [$_, @_];
+            no warnings "uninitialized";
+            s/\$(\$|\w+)/$vars{$1}/ge for @_;
+            /\$/            or return [$_, @_];
+            $_[0] eq '$'    and return;
             $vars{$_[0]} = $_[1]; 
             return;
         }

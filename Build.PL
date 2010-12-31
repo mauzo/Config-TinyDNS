@@ -10,5 +10,9 @@ Module::Build->new(
     },
     build_requires  => {
         "Test::More"        => "0.65",
+        "Test::Warn"        => 0,
+        "Test::NoWarnings"  => "1.00",
+        "Test::Exception"   => 0,
+        "Test::Exports"     => 1,
     },
 )->create_build_script;
