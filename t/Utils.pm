@@ -9,7 +9,7 @@ use Config::TinyDNS;
 
 use Exporter::NoWork;
 
-our ($Filter, $Data, $Want);
+our (@Filter, $Data, $Want);
 
 # END blocks don't work with done_testing
 require Test::NoWarnings;
@@ -25,20 +25,21 @@ sub IMPORT {
     shift;
     my $caller = caller 2;
     no strict "refs";
-    for (qw/Filter Data Want/) {
-        *{"$caller\::$_"} = \$$_;
-    }
+    *{"$caller\::Filter"} = \@Filter;
+    *{"$caller\::Data"}   = \$Data;
+    *{"$caller\::Want"}   = \$Want;
     return @_;
 }
 
 sub filt {
     my ($data, $want, $name) = @_;
     $#_ < 2 and ($want, $name) = ($data, $want);
+    no warnings "uninitialized";
     for ($Data, $Want, $data, $want) {
         ref and $_ = join "\n", @$_;
     }
     my $B = Test::More->builder;
-    my $got = Config::TinyDNS::filter_tdns_data($Data . $data, $Filter);
+    my $got = Config::TinyDNS::filter_tdns_data($Data . $data, @Filter);
     $B->is_eq($got, $Want . $want, $name);
 }
 

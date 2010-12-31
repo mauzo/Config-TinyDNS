@@ -47,16 +47,20 @@ sub _decode_filt {
     }
 }
 
+sub _call_filt {
+    my $c = shift;
+    my $r = @_ ? shift : $_;
+    my ($f, @r) = @$r;
+    local $_ = $f;
+    $c->(@r);
+}
+
 sub filter_tdns_data {
     my @lines = split_tdns_data shift;
     for my $f (@_) {
         my $c = _decode_filt $f;
         @lines = 
-            map {
-                my ($f, @r) = @$_;
-                local $_ = $f;
-                $c->(@r);
-            } 
+            map _call_filt($c),
             @lines;
     }
     return join_tdns_data @lines;
@@ -91,10 +95,14 @@ register_tdns_filters
             return;
         }
     },
-    include => sub {
-        /I/ or return [$_, @_];
-        require File::Slurp;
-        return split_tdns_data scalar File::Slurp::read_file($_[0]);
+    include => \sub {
+        my $include;
+        $include = sub {
+            /I/ or return [$_, @_];
+            require File::Slurp;
+            return map _call_filt($include),
+                split_tdns_data scalar File::Slurp::read_file($_[0]);
+        };
     },
     lresolv => \sub {
         my %hosts;

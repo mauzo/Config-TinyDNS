@@ -2,7 +2,7 @@
 
 use t::Utils qw/:ALL/;
 
-$Filter = "vars";
+@Filter = "vars";
 $Want = $Data = <<DATA;
 +foo.com:1.2.3.4::lo
 =bar.org:2.3.4.5
