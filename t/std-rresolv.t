@@ -1,9 +1,12 @@
 #!/usr/bin/perl
 
+use 5.010;
 use Socket qw/inet_aton/;
 
 my $IP;
-BEGIN { *CORE::GLOBAL::gethostbyname = sub { inet_aton $IP } }
+BEGIN { 
+    *CORE::GLOBAL::gethostbyname = sub { inet_aton($IP // "0.0.0.0") } 
+}
 
 use t::Utils qw/:ALL/;
 

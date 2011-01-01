@@ -76,7 +76,7 @@ sub split_tdns_data {
 
 sub _strip_blank { 
     @_ = @{[@_]}; 
-    pop while @_ and not length $_[-1]; 
+    pop while @_ and not (defined $_[-1] and length $_[-1]); 
     @_;
 }
 

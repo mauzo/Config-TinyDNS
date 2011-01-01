@@ -4,7 +4,7 @@ use t::Utils qw/:ALL/;
 
 @Filter = [site => qw/foo bar/];
 
-filt (<<DATA) x 2,              "site leaves non-% lines alone";
+filt +(<<DATA) x 2,             "site leaves non-% lines alone";
 +foo.com:1.2.3.4:::lo
 =bar.org:2.3.4.5
 DATA

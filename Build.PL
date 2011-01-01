@@ -4,6 +4,7 @@ Module::Build->new(
     module_name     => "Config::TinyDNS",
     license         => "bsd",
     requires        => {
+        perl                => "5.010",
         "File::Slurp"       => 0,
         "Exporter::NoWork"  => 0,
         "List::MoreUtils"   => 0,

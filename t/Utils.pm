@@ -23,6 +23,8 @@ require Test::NoWarnings;
 
 sub IMPORT {
     shift;
+    strict->import;
+    warnings->import;
     my $caller = caller 2;
     no strict "refs";
     *{"$caller\::Filter"} = \@Filter;
