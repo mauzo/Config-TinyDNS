@@ -17,3 +17,4 @@ t/std-vars.t
 t/two
 t/Utils.pm
 t/var
+META.yml
