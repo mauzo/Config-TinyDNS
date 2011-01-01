@@ -221,10 +221,6 @@ sub _filter_hash { \%Filters }
 Many of these filters introduce ordering constraints on the lines of the
 file. Be careful about re-ordering files written for them.
 
-=cut
-
-register_tdns_filters
-
 =head2 null
 
 Pass all lines through unchanged. Note that blank lines and trailing
@@ -232,7 +228,8 @@ blank fields will still be removed.
 
 =cut
 
-    null => sub { [$_, @_] },
+register_tdns_filters 
+    null => sub { [$_, @_] };
 
 =head2 vars
 
@@ -261,6 +258,7 @@ translates to
 
 =cut
 
+register_tdns_filters 
     vars => \sub {
         my %vars = ('$' => '$');
         sub {
@@ -271,7 +269,7 @@ translates to
             $vars{$_[0]} = $_[1]; 
             return;
         }
-    },
+    };
 
 =head2 include
 
@@ -285,6 +283,7 @@ through any other filters (though this may change at some point).
 
 =cut
 
+register_tdns_filters
     include => \sub {
         my $include;
         $include = sub {
@@ -293,7 +292,7 @@ through any other filters (though this may change at some point).
             return map _call_filt($include),
                 split_tdns_data scalar File::Slurp::read_file($_[0]);
         };
-    },
+    };
 
 =head2 lresolv
 
@@ -316,6 +315,7 @@ would translate to
 
 =cut
 
+register_tdns_filters
     lresolv => \sub {
         no warnings "uninitialized";
         my %hosts;
@@ -350,7 +350,7 @@ would translate to
             }
             [$_, @_];
         };
-    },
+    };
 
 =head2 rresolv
 
@@ -362,6 +362,7 @@ C<+=.&@> lines.
 
 =cut
 
+register_tdns_filters
     rresolv => \sub {
         require Socket;
         my $repl = sub { 
@@ -373,7 +374,7 @@ C<+=.&@> lines.
             }
         };
         sub { /[.&+=\@]/ and $repl->($_[1]); [$_, @_]; };
-    },
+    };
 
 =head2 site I<SITES>
 
@@ -388,6 +389,7 @@ different views on the DNS from one master file.
 
 =cut
 
+register_tdns_filters
     site => \sub {
         my %sites = map +($_, 1), @_;
         sub {
@@ -397,8 +399,7 @@ different views on the DNS from one master file.
             $sites{$site}   or return;
             return [$_, @_];
         };
-    },
-    ;
+    };
 
 1;
 
