@@ -1,5 +1,6 @@
 bin/tinydns-filter
 Build.PL
+Changes
 lib/Config/TinyDNS.pm
 MANIFEST			This list of files
 t/00use.t
